@@ -43,6 +43,41 @@ namespace ToDoList
       _name = newName;
     }
 
+    public List<Task> GetTasks()
+    {
+      List<Task> allTasks = new List<Task>{};
+
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks WHERE category_Id = @TasksCategory;", conn);
+
+      SqlParameter taskCategory = new SqlParameter();
+      taskCategory.ParameterName = "@TasksCategory";
+      taskCategory.Value = this.GetId();
+      cmd.Parameters.Add(taskCategory);
+      SqlDataReader rdr = cmd.ExecuteReader();
+
+      while(rdr.Read())
+      {
+        int taskId = rdr.GetInt32(0);
+        string taskName = rdr.GetString(1);
+        int categoryId = rdr.GetInt32(2);
+        Task newTask = new Task(taskName, taskId, categoryId);
+        allTasks.Add(newTask);
+      }
+
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return allTasks;
+    }
+
     public static List<Category> GetAll()
     {
       List<Category> allCategories = new List<Category>{};
