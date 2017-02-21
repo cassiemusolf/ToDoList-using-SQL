@@ -10,7 +10,7 @@ namespace ToDoList
   {
     public ToDoTest()
     {
-      DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=todo_test;Integrated Security=SSPI;";
+      DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=ToDoList_Test;Integrated Security=SSPI;";
     }
 
     public void Dispose()
@@ -31,8 +31,8 @@ namespace ToDoList
     public void Test_Equal_ReturnsTrueIfDescriptionsAreTheSame()
     {
       //Arrange, Act
-      Task firstTask = new Task("Mow the lawn");
-      Task secondTask = new Task("Mow the lawn");
+      Task firstTask = new Task("Mow the lawn", 1);
+      Task secondTask = new Task("Mow the lawn", 1);
 
       //Assert
       Assert.Equal(firstTask, secondTask);
@@ -41,7 +41,7 @@ namespace ToDoList
     public void Test_Save_SavesToDatabase()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn");
+      Task testTask = new Task("Mow the lawn", 1);
       //Act
       testTask.Save();
       List<Task> result = Task.GetAll();
@@ -53,7 +53,7 @@ namespace ToDoList
     public void Test_Save_AssignsIdToObject()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn");
+      Task testTask = new Task("Mow the lawn", 1);
 
       //Act
       testTask.Save();
@@ -69,7 +69,7 @@ namespace ToDoList
     public void Test_Find_FindsTaskInDatabase()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn");
+      Task testTask = new Task("Mow the lawn", 1);
       testTask.Save();
 
       //Act
