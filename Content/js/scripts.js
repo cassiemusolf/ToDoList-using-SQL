@@ -1,6 +1,12 @@
 function formatDate(value)
 {
-   return value.getFullYear() + "-" + value.getMonth()+1 + "-" + value.getDate();
+  var month = parseInt(value.getMonth()) + 1;
+  if(month < 10)
+  {
+    month = "0" + month;
+  }
+
+  return value.getFullYear() + "-" + month + "-" + value.getDate();
 }
 
 $(function(){
