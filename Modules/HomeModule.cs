@@ -14,6 +14,7 @@ namespace ToDoList
       };
 
       Get["/tasks"] = _ => {
+        Task.Organize();
         List<Task> AllTasks = Task.GetAll();
         return View["tasks.cshtml", AllTasks];
       };

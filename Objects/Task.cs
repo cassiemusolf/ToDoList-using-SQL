@@ -37,9 +37,9 @@ namespace ToDoList
       return _description;
     }
 
-    public DateTime GetDueDate()
+    public string GetDueDate()
     {
-      return _duedate;
+      return _duedate.ToShortDateString();
     }
 
     public void SetDescription(string newDescription)
@@ -120,6 +120,7 @@ namespace ToDoList
       {
         this._id = rdr.GetInt32(0);
       }
+
       if (rdr != null)
       {
         rdr.Close();
@@ -129,6 +130,20 @@ namespace ToDoList
         conn.Close();
       }
     }
+
+    public static void Organize()
+    {
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks ORDER BY name;", conn);
+      cmd.ExecuteNonQuery();
+
+      if (conn != null)
+      {
+        conn.Close();
+      }
+    }
+
     public static void DeleteAll()
     {
       SqlConnection conn = DB.Connection();
