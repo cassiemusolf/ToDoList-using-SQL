@@ -68,7 +68,7 @@ namespace ToDoList
       SqlConnection conn = DB.Connection();
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks;", conn);
+      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks ORDER BY due_date;", conn);
       SqlDataReader rdr = cmd.ExecuteReader();
 
       while(rdr.Read())
@@ -125,19 +125,6 @@ namespace ToDoList
       {
         rdr.Close();
       }
-      if (conn != null)
-      {
-        conn.Close();
-      }
-    }
-
-    public static void Organize()
-    {
-      SqlConnection conn = DB.Connection();
-      conn.Open();
-      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks ORDER BY name;", conn);
-      cmd.ExecuteNonQuery();
-
       if (conn != null)
       {
         conn.Close();
