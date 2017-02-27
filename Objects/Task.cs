@@ -9,12 +9,14 @@ namespace ToDoList
     private int _id;
     private string _description;
     private DateTime _duedate;
+    private bool _status;
 
-    public Task(string Description, DateTime DueDate, int Id = 0)
+    public Task(string Description, DateTime DueDate, bool Status = false, int Id = 0)
     {
       _id = Id;
       _description = Description;
       _duedate = DueDate;
+      _status = Status;
     }
 
     public int GetId()
@@ -37,6 +39,12 @@ namespace ToDoList
     {
       _description = newDescription;
     }
+
+    public bool GetStatus()
+    {
+      return _status;
+    }
+
     public override bool Equals(System.Object otherTask)
     {
       if (!(otherTask is Task))
@@ -48,7 +56,8 @@ namespace ToDoList
         Task newTask = (Task) otherTask;
         bool idEquality = (this.GetId() == newTask.GetId());
         bool descriptionEquality = (this.GetDescription() == newTask.GetDescription());
-        return (idEquality && descriptionEquality);
+        bool statusEquality = (this.GetStatus()==newTask.GetStatus());
+        return (idEquality && descriptionEquality && statusEquality);
       }
     }
     public static List<Task> GetAll()
@@ -66,7 +75,8 @@ namespace ToDoList
         int taskId = rdr.GetInt32(0);
         string taskDescription = rdr.GetString(1);
         DateTime taskDueDate = rdr.GetDateTime(2);
-        Task newTask = new Task(taskDescription, taskDueDate, taskId);
+        bool taskStatus = rdr.GetBoolean(3);
+        Task newTask = new Task(taskDescription, taskDueDate, taskStatus, taskId);
         allTasks.Add(newTask);
       }
 
@@ -86,7 +96,7 @@ namespace ToDoList
       SqlConnection conn = DB.Connection();
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("INSERT INTO tasks (name, due_date) OUTPUT INSERTED.id VALUES (@TaskDescription, @TaskDueDate);", conn);
+      SqlCommand cmd = new SqlCommand("INSERT INTO tasks (name, due_date, status) OUTPUT INSERTED.id VALUES (@TaskDescription, @TaskDueDate, @TaskStatus);", conn);
 
       SqlParameter descriptionParameter = new SqlParameter();
       descriptionParameter.ParameterName = "@TaskDescription";
@@ -96,8 +106,11 @@ namespace ToDoList
       dueDateParameter.ParameterName = "@TaskDueDate";
       dueDateParameter.Value = this.GetDueDate();
 
+      SqlParameter statusParameter = new SqlParameter("@TaskStatus", this.GetStatus());
+
       cmd.Parameters.Add(descriptionParameter);
       cmd.Parameters.Add(dueDateParameter);
+      cmd.Parameters.Add(statusParameter);
       SqlDataReader rdr = cmd.ExecuteReader();
 
       while(rdr.Read())
@@ -138,14 +151,16 @@ namespace ToDoList
       int foundTaskId = 0;
       string foundTaskDescription = null;
       DateTime foundDueDate = new DateTime();
+      bool foundStatus = false;
 
       while(rdr.Read())
       {
         foundTaskId = rdr.GetInt32(0);
         foundTaskDescription = rdr.GetString(1);
         foundDueDate = rdr.GetDateTime(2);
+        foundStatus = rdr.GetBoolean(3);
       }
-      Task foundTask = new Task(foundTaskDescription, foundDueDate, foundTaskId);
+      Task foundTask = new Task(foundTaskDescription, foundDueDate, foundStatus, foundTaskId);
 
       if (rdr != null)
       {
@@ -258,6 +273,24 @@ namespace ToDoList
         {
           conn.Close();
         }
+      }
+
+      public void MarkDone()
+      {
+        SqlConnection conn = DB.Connection();
+        conn.Open();
+
+        SqlCommand cmd = new SqlCommand("UPDATE tasks SET status = 1 WHERE id = @taskId;", conn);
+        SqlParameter taskIdParameter = new SqlParameter("@taskId", this.GetId());
+
+        cmd.Parameters.Add(taskIdParameter);
+        cmd.ExecuteNonQuery();
+
+        if(conn != null)
+        {
+          conn.Close();
+        }
+
       }
     }
   }

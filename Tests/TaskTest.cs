@@ -138,6 +138,16 @@ namespace ToDoList
 
       Assert.Equal(testCategoryTasks, resultCategoryTasks);
     }
+    [Fact]
+    public void Test_MarkDone_MarkTaskAsDone()
+    {
+      DateTime date1 = new DateTime(2008, 4, 10);
+      Task testTask = new Task("Mow the lawn", date1);
+      testTask.Save();
+      testTask.MarkDone();
+      Task actual = Task.GetAll()[0];
 
+      Assert.Equal(true, actual.GetStatus());
+    }
   }
 }
