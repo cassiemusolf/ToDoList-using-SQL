@@ -32,8 +32,8 @@ namespace ToDoList
     {
       //Arrange, Act
       DateTime date1 = new DateTime(2008, 4, 10);
-      Task firstTask = new Task("Mow the lawn", 1, date1);
-      Task secondTask = new Task("Mow the lawn", 1, date1);
+      Task firstTask = new Task("Mow the lawn", date1);
+      Task secondTask = new Task("Mow the lawn", date1);
 
       //Assert
       Assert.Equal(firstTask, secondTask);
@@ -43,7 +43,7 @@ namespace ToDoList
     {
       //Arrange
       DateTime date1 = new DateTime(2008, 4, 10);
-      Task testTask = new Task("Mow the lawn", 1, date1);
+      Task testTask = new Task("Mow the lawn", date1);
       //Act
       testTask.Save();
       List<Task> result = Task.GetAll();
@@ -56,7 +56,7 @@ namespace ToDoList
     {
       //Arrange
       DateTime date1 = new DateTime(2008, 4, 10);
-      Task testTask = new Task("Mow the lawn", 1, date1);
+      Task testTask = new Task("Mow the lawn", date1);
 
       //Act
       testTask.Save();
@@ -73,7 +73,7 @@ namespace ToDoList
     {
       //Arrange
       DateTime date1 = new DateTime(2008, 4, 10);
-      Task testTask = new Task("Mow the lawn", 1, date1);
+      Task testTask = new Task("Mow the lawn", date1);
       testTask.Save();
 
       //Act
@@ -81,6 +81,42 @@ namespace ToDoList
 
       //Assert
       Assert.Equal(testTask, foundTask);
+    }
+    [Fact]
+    public void Test_AddCategory_AddsCategoryToTask()
+    {
+      DateTime date1 = new DateTime(2008, 4, 10);
+      Task testTask = new Task("Mow the lawn", date1);
+      testTask.Save();
+
+      Category testCategory = new Category("Home Stuff");
+      testCategory.Save();
+
+      testTask.AddCategory(testCategory);
+
+      List<Category> result = testTask.GetCategories();
+      List<Category> testList = new List<Category>{testCategory};
+
+      Assert.Equal(testList, result);
+    }
+    [Fact]
+    public void Test_GetCategories_ReturnsAllTaskCategories()
+    {
+      DateTime date1 = new DateTime(2008, 4, 10);
+      Task testTask = new Task("Mow the lawn", date1);
+      testTask.Save();
+
+      Category testCategory1 = new Category("Home stuff");
+      testCategory1.Save();
+
+      Category testCategory2 = new Category("Work stuff");
+      testCategory2.Save();
+
+      testTask.AddCategory(testCategory1);
+      List<Category> result = testTask.GetCategories();
+      List<Category> testList = new List<Category> {testCategory1};
+
+      Assert.Equal(testList, result);
     }
 
   }
