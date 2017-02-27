@@ -16,6 +16,7 @@ namespace ToDoList
     public void Dispose()
     {
       Task.DeleteAll();
+      Category.DeleteAll();
     }
 
     [Fact]
@@ -117,6 +118,25 @@ namespace ToDoList
       List<Category> testList = new List<Category> {testCategory1};
 
       Assert.Equal(testList, result);
+    }
+    [Fact]
+    public void Test_Delete_DeletesTaskAssociationsFromDatabase()
+    {
+      Category testCategory = new Category("Home stuff");
+      testCategory.Save();
+
+      string testDescription = "Mow the lawn";
+      DateTime date1 = new DateTime(2008, 4, 10);
+      Task testTask = new Task(testDescription, date1);
+      testTask.Save();
+
+      testTask.AddCategory(testCategory);
+      testTask.Delete();
+
+      List<Task> resultCategoryTasks = testCategory.GetTasks();
+      List<Task> testCategoryTasks = new List<Task> {};
+
+      Assert.Equal(testCategoryTasks, resultCategoryTasks);
     }
 
   }

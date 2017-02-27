@@ -9,8 +9,7 @@ namespace ToDoList
     public HomeModule()
     {
       Get["/"] = _ => {
-        List<Category> allCategories = Category.GetAll();
-        return View["index.cshtml", allCategories];
+        return View["index.cshtml"];
       };
 
       Get["/tasks"] = _ => {
@@ -34,12 +33,11 @@ namespace ToDoList
       };
 
       Get["/tasks/new"] = _ => {
-        List<Category> allCategories = Category.GetAll();
-        return View["tasks_form.cshtml", allCategories];
+        return View["tasks_form.cshtml"];
       };
 
       Post["/tasks/new"] = _ => {
-        Task newTask = new Task(Request.Form["task-description"], Request.Form["category-id"], Request.Form["due-date"]);
+        Task newTask = new Task(Request.Form["task-description"], Request.Form["due-date"]);
         newTask.Save();
         return View["success.cshtml"];
       };
@@ -51,11 +49,50 @@ namespace ToDoList
 
       Get["/categories/{id}"] = parameters => {
         Dictionary<string, object> model = new Dictionary<string, object>();
-        var SelectedCategory = Category.Find(parameters.id);
-        var CategoryTasks = SelectedCategory.GetTasks();
+        Category SelectedCategory = Category.Find(parameters.id);
+        List<Task> CategoryTasks = SelectedCategory.GetTasks();
+        List<Task> AllTasks = Task.GetAll();
         model.Add("category", SelectedCategory);
-        model.Add("tasks", CategoryTasks);
+        model.Add("categoryTasks", CategoryTasks);
+        model.Add("allTasks", AllTasks);
         return View["category.cshtml", model];
+      };
+
+      Get["tasks/{id}"] = parameters => {
+        Dictionary<string,object> model = new Dictionary<string, object>();
+        Task SelectedTask = Task.Find(parameters.id);
+        List<Category> TaskCategories = SelectedTask.GetCategories();
+        List<Category> allCategories = Category.GetAll();
+        model.Add("task", SelectedTask);
+        model.Add("TaskCategories", TaskCategories);
+        model.Add("allCategories", allCategories);
+        return View["task.cshtml", model];
+      };
+
+      Post["task/add_category"] = _ => {
+        Category category = Category.Find(Request.Form["category-id"]);
+        Task task = Task.Find(Request.Form["task-id"]);
+        List<Category> taskCategories = task.GetCategories();
+        bool tracker = false;
+        foreach (Category thisCategory in taskCategories)
+        {
+          if (category.GetName()== thisCategory.GetName())
+          {
+            tracker = true;
+          }
+        }
+        if (!tracker)
+        {
+          task.AddCategory(category);
+        }
+        return View["success.cshtml"];
+      };
+
+      Post["category/add_task"] = _ => {
+        Category category = Category.Find(Request.Form["category-id"]);
+        Task task = Task.Find(Request.Form["task-id"]);
+        category.AddTask(task);
+        return View["success.cshtml"];
       };
     }
   }
